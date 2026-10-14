@@ -1,0 +1,56 @@
+{
+  "include": ["src/**/*"],
+  "compilerOptions": {
+    // File Layout
+    //include is not a compiler option, but a top-level tsconfig option. See https://www.typescriptlang.org/tsconfig#include
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    // Environment Settings
+    // See also https://aka.ms/tsconfig/module
+    "module": "esnext",
+    "target": "es2022",
+    "types": ["node"],
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "esModuleInterop": true,
+    "traceResolution": true,
+    // For nodejs:
+    // "lib": ["esnext"],
+    // "types": ["node"],
+    // and npm install -D @types/node
+
+    // Other Outputs
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Style Options
+    // "noImplicitReturns": true,
+    // "noImplicitOverride": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noPropertyAccessFromIndexSignature": true,
+
+    // Recommended Options
+    "strict": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": false,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+    "paths": {
+      "@utils/*": ["./src/utils/*"],
+      "@modules": ["./src/modules"],
+      "@resources/*": ["./src/resources/*"],
+      "@schemas/*": ["./src/schemas/*"],
+      "@config": ["./src/config.ts"]
+    }
+  }
+}
