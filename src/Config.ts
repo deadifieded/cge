@@ -1,6 +1,6 @@
 import type { PartConfig } from "./Part";
 import { Part, PartMap } from "./Part";
-import { FileWriter } from "@utils/FileWriter";
+import { FileWriter, type Formatter } from "@utils/FileWriter";
 import type { Resource } from "./Resource";
 
 /**
@@ -28,6 +28,12 @@ export type ConfigProps<Environment extends string> = {
   /** The environment variable parts read unless they set their own. */
   environmentVariable: string;
   parts: PartConfigInput<Environment>[];
+  /**
+   * Formats every generated file before it is written, e.g.
+   * `prettierFormatter(await import("prettier"))`. Pass `(content) => content`
+   * to write files as generated.
+   */
+  format: Formatter;
 };
 
 export class Config<Environment extends string> {
@@ -73,7 +79,7 @@ export class Config<Environment extends string> {
     }
 
     try {
-      const stats = await fileWriter.applyChanges();
+      const stats = await fileWriter.applyChanges(this.configProps.format);
       console.log(`Success!\nFiles in changes: ${stats.filesInChanges}, Lines in changes: ${stats.linesInChanges}`);
     } catch (error) {
       throw error;

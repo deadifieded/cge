@@ -5,6 +5,15 @@ CGE generates code for the monorepo's parts from the schemas in `src/schemas/`. 
 only creates files outside `generated/` (handler templates, `lifespan.py`) when they
 don't already exist.
 
+## Package
+
+CGE is published to npm as `codegen-engine`. `src/index.ts` is its only entry, so
+anything consumers need must be re-exported from there. `npm run build` bundles it
+with tsdown into `dist/index.mjs` and `dist/index.d.mts`, resolving the `@utils/*`
+path aliases. Only `dist/` is published. CGE has no runtime dependencies: `Config`
+takes a required `format` function, for example `prettierFormatter(prettier)` from
+the consumer's own prettier, or `(content) => content` to skip formatting.
+
 ## How a run fits together
 
 | Concept | File | Role |

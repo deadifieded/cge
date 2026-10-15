@@ -14,7 +14,6 @@
     "moduleResolution": "bundler",
     "noEmit": true,
     "esModuleInterop": true,
-    "traceResolution": true,
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],

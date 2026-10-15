@@ -1,10 +1,38 @@
 import { readFileSync, mkdirSync, existsSync, writeFileSync, rmSync } from "fs";
 import { join, dirname } from "path";
-import * as prettier from "prettier"; // Import the Prettier API
 
 type WriteMetrics = {
   filesInChanges: number;
   linesInChanges: number;
+}
+
+/**
+ * Formats a file's content before it is written. Return the content unchanged
+ * for files it doesn't know how to format.
+ */
+export type Formatter = (
+  content: string,
+  filePath: string,
+) => string | Promise<string>;
+
+/** The parts of the `prettier` module `prettierFormatter` needs. */
+export type PrettierLike = {
+  resolveConfig(filePath: string): Promise<object | null>;
+  getFileInfo(filePath: string): Promise<{ inferredParser: string | null }>;
+  format(source: string, options: object): Promise<string>;
+};
+
+/**
+ * Formats with prettier, using the `.prettierrc` that applies to each file and
+ * skipping files prettier has no parser for.
+ * Usage: `format: prettierFormatter(await import("prettier"))`.
+ */
+export function prettierFormatter(prettier: PrettierLike): Formatter {
+  return async (content, filePath) => {
+    if (!(await prettier.getFileInfo(filePath)).inferredParser) return content;
+    const config = await prettier.resolveConfig(filePath);
+    return prettier.format(content, { ...config, filepath: filePath });
+  };
 }
 
 export class FileReader {
@@ -56,9 +84,7 @@ export class FileWriter extends FileReader {
     }
   }
 
-  async applyChanges(format: boolean = true): Promise<WriteMetrics> {
-    // 1. Fetch your project's .prettierrc configuration if it exists
-    const prettierConfig = await prettier.resolveConfig(process.cwd());
+  async applyChanges(format?: Formatter): Promise<WriteMetrics> {
     const nofFiles = Object.keys(this.changes).length;
     let nofLines = 0
 
@@ -70,13 +96,9 @@ export class FileWriter extends FileReader {
       }
       let content = change.content || "";
 
-      if (format && (await prettier.getFileInfo(fullPath)).inferredParser) {
-        // 2. Format the content before writing
+      if (format) {
         try {
-          content = await prettier.format(content, {
-            ...prettierConfig,
-            filepath: fullPath, // Automatically infers the correct parser (TS, JS, etc.)
-          });
+          content = await format(content, fullPath);
         } catch (err) {
           console.warn(
             `Could not format ${fullPath}, writing raw content instead.`,
@@ -84,7 +106,7 @@ export class FileWriter extends FileReader {
           );
         }
       }
-      // 3. Ensure directory exists and write
+      // Ensure directory exists and write
       mkdirSync(dirname(fullPath), { recursive: true });
 
       if (
@@ -138,7 +160,7 @@ export class Scope extends FileWriter {
     return this.fileWriter.readFile(join(this.root, filePath));
   }
 
-  async applyChanges(format: boolean = true): Promise<WriteMetrics> {
+  async applyChanges(format?: Formatter): Promise<WriteMetrics> {
     throw "Cannot apply changes from a Scope. Call applyChanges on the parent FileWriter instead.";
   }
 

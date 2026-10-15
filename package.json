@@ -1,14 +1,24 @@
 {
   "name": "codegen-engine",
-  "version": "0.0.1",
-  "main": "index.js",
+  "version": "0.0.2",
   "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rimraf dist && esbuild src/generate.ts --bundle --platform=node --outdir=dist --format=esm --tsconfig=tsconfig.json",
-    "generate": "tsx src/generate.ts",
+    "build": "tsdown",
     "typecheck": "tsgo --noEmit",
-    "uml": "tsx src/uml/serve.ts"
+    "prepublishOnly": "npm run typecheck && npm run build"
   },
   "keywords": [],
   "author": "John Cruickshank",
@@ -17,12 +27,7 @@
   "devDependencies": {
     "@types/node": "^24.10.2",
     "@typescript/native-preview": "^7.0.0-dev.20260328.1",
-    "esbuild": "^0.27.3",
-    "marked": "^18.1.0",
-    "mermaid": "^12.1.0",
-    "prettier": "^3.8.1",
-    "rimraf": "^6.1.3",
-    "tsx": "^4.21.0",
+    "tsdown": "^0.23.1",
     "typescript": "^5.9.3"
   }
 }
