@@ -9,8 +9,8 @@ import {
   Method,
   Inputs,
   OptionalInputs,
-} from "@utils/codegen";
-import { Language } from "@utils/Language";
+} from "../index";
+import { Language } from "../../Language";
 
 const constructorNameInLanguage: { [key in Language]: string } = {
   py: "__init__",

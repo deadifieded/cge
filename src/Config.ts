@@ -1,6 +1,6 @@
 import type { PartConfig } from "./Part";
 import { Part, PartMap } from "./Part";
-import { FileWriter, type Formatter } from "@utils/FileWriter";
+import { FileWriter, type Formatter } from "./utils/FileWriter";
 import type { Resource } from "./Resource";
 
 /**
@@ -33,7 +33,7 @@ export type ConfigProps<Environment extends string> = {
    * `prettierFormatter(await import("prettier"))`. Pass `(content) => content`
    * to write files as generated.
    */
-  format: Formatter;
+  format?: Formatter;
 };
 
 export class Config<Environment extends string> {

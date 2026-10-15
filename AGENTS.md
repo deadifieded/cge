@@ -14,6 +14,23 @@ path aliases. Only `dist/` is published. CGE has no runtime dependencies: `Confi
 takes a required `format` function, for example `prettierFormatter(prettier)` from
 the consumer's own prettier, or `(content) => content` to skip formatting.
 
+## Sandbox
+
+`example/` is a local playground that mirrors spotiby's `code/cge`: the parts `api`
+(py), `frontend` (ts) and `cge`, with the same modules, resource and schemas. Its
+tsconfig maps `codegen-engine` to `../src/index.ts`, so modules import from
+`"codegen-engine"` exactly like a real consumer, but run against the live source. Edits
+to `src/` show up on the next run with no build. That only works because `src/` uses
+relative imports, so don't add path aliases to the engine.
+
+- `npm run example` regenerates `example/{api,frontend,cge}/src/generated/` (gitignored).
+- `npm run example:uml` serves the `Uml` diagrams at http://localhost:4321.
+- `npm run typecheck` checks the engine and the sandbox, so API changes that break
+  consumers show up here first.
+
+Modules don't use model archetypes. Each module builds its own `Model` (see
+`example/cge/src/modules/Requests/clientModel.ts`).
+
 ## How a run fits together
 
 | Concept | File | Role |

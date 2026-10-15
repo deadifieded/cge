@@ -1,4 +1,4 @@
-import { Code } from "@utils/codegen";
+import { Code } from "./index";
 
 export type JSONValue =
   | string

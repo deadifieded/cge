@@ -7,7 +7,7 @@ import {
   pythonMemberTypeMap,
   assertArrayIsValid,
   Value,
-} from "@utils/codegen";
+} from "../../index";
 import { emitTypeTs } from "./getTsCode";
 import { isStringObject } from "util/types";
 

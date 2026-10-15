@@ -1,6 +1,6 @@
-import { MemberValue, Code } from "@utils/codegen";
-import { Requirements } from "@utils/codegen";
-import { Language } from "@utils/Language";
+import { MemberValue, Code } from "../../index";
+import { Requirements } from "../../index";
+import { Language } from "../../../Language";
 import { getPyCode } from "./getPyCode";
 import { getTsCode } from "./getTsCode";
 

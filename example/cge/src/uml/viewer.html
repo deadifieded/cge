@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CGE UML</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --fg: #1f2328;
+        --muted: #59636e;
+        --border: #d1d9e0;
+        --active: #ddf4ff;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0d1117;
+          --fg: #e6edf3;
+          --muted: #9198a1;
+          --border: #3d444d;
+          --active: #1f3a5f;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        display: flex;
+        height: 100vh;
+        background: var(--bg);
+        color: var(--fg);
+        font-family: system-ui, sans-serif;
+      }
+      nav {
+        width: 260px;
+        flex-shrink: 0;
+        overflow-y: auto;
+        border-right: 1px solid var(--border);
+        padding: 12px;
+      }
+      nav h2 {
+        margin: 16px 0 4px;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      nav a {
+        display: block;
+        padding: 3px 8px;
+        border-radius: 6px;
+        color: inherit;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      nav a.active {
+        background: var(--active);
+      }
+      main {
+        flex: 1;
+        overflow: auto;
+        padding: 16px 32px;
+      }
+      main a {
+        color: #4493f8;
+      }
+      pre.mermaid {
+        background: none;
+      }
+      @media (max-width: 700px) {
+        body {
+          flex-direction: column;
+        }
+        nav {
+          width: auto;
+          max-height: 35vh;
+          border-right: none;
+          border-bottom: 1px solid var(--border);
+        }
+        main {
+          padding: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="nav"></nav>
+    <main id="content"></main>
+    <script type="module">
+      import mermaid from "/vendor/mermaid/mermaid.esm.min.mjs";
+      import { marked } from "/vendor/marked/marked.esm.js";
+
+      const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+      mermaid.initialize({ startOnLoad: false, theme: dark ? "dark" : "default" });
+
+      const nav = document.getElementById("nav");
+      const content = document.getElementById("content");
+
+      // "api/Uml/endpoints/GetFeed.md" is grouped under "api / endpoints".
+      const files = await (await fetch("/api/files")).json();
+      const groups = new Map();
+      for (const file of files) {
+        const [provider, , ...rest] = file.split("/");
+        const group = [provider, ...rest.slice(0, -1)].join(" / ");
+        if (!groups.has(group)) groups.set(group, []);
+        groups.get(group).push(file);
+      }
+      for (const [group, groupFiles] of groups) {
+        const heading = document.createElement("h2");
+        heading.textContent = group;
+        nav.append(heading);
+        const isIndex = (file) => file.endsWith("/index.md");
+        groupFiles.sort((a, b) => isIndex(b) - isIndex(a) || a.localeCompare(b));
+        for (const file of groupFiles) {
+          const link = document.createElement("a");
+          link.href = "#" + file;
+          link.textContent = file.split("/").pop().replace(/\.md$/, "");
+          nav.append(link);
+        }
+      }
+
+      async function show() {
+        const file = decodeURIComponent(location.hash.slice(1)) || files.find((f) => f.endsWith("/index.md")) || files[0];
+        for (const link of nav.querySelectorAll("a")) {
+          link.classList.toggle("active", link.getAttribute("href") === "#" + file);
+        }
+        if (!file) {
+          content.textContent = "No diagrams found. Run pnpm generate first.";
+          return;
+        }
+        const response = await fetch("/files/" + file);
+        if (!response.ok) {
+          content.textContent = `Couldn't load ${file}.`;
+          return;
+        }
+        content.innerHTML = marked.parse(await response.text());
+
+        for (const code of content.querySelectorAll("code.language-mermaid")) {
+          const pre = document.createElement("pre");
+          pre.className = "mermaid";
+          pre.textContent = code.textContent;
+          code.parentElement.replaceWith(pre);
+        }
+        // Relative .md links open inside the viewer.
+        const dir = file.split("/").slice(0, -1).join("/");
+        for (const link of content.querySelectorAll("a[href$='.md']")) {
+          const target = new URL(link.getAttribute("href"), "http://x/" + dir + "/").pathname.slice(1);
+          link.href = "#" + target;
+        }
+        await mermaid.run({ nodes: content.querySelectorAll("pre.mermaid") });
+      }
+
+      addEventListener("hashchange", show);
+      show();
+    </script>
+  </body>
+</html>

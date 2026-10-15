@@ -1,6 +1,6 @@
 {
   "name": "codegen-engine",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "main": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
@@ -17,8 +17,10 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsdown",
-    "typecheck": "tsgo --noEmit",
-    "prepublishOnly": "npm run typecheck && npm run build"
+    "typecheck": "tsgo --noEmit && tsgo --noEmit -p example",
+    "prepublishOnly": "npm run typecheck && npm run build",
+    "example": "tsx --tsconfig example/tsconfig.json example/cge/src/generate.ts",
+    "example:uml": "tsx --tsconfig example/tsconfig.json example/cge/src/uml/serve.ts"
   },
   "keywords": [],
   "author": "John Cruickshank",
@@ -27,7 +29,11 @@
   "devDependencies": {
     "@types/node": "^24.10.2",
     "@typescript/native-preview": "^7.0.0-dev.20260328.1",
+    "marked": "^18.1.1",
+    "mermaid": "^12.2.0",
+    "prettier": "^3.9.10",
     "tsdown": "^0.23.1",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3"
   }
 }

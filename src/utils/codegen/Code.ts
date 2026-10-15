@@ -1,4 +1,4 @@
-import { Language } from "@utils/Language";
+import { Language } from "../Language";
 
 export type Code = { [key in Language]: string };
 

@@ -1,6 +1,6 @@
 import type { Module } from "./Module";
-import { FileReader, FileWriter } from "@utils/FileWriter";
-import { Language } from "@utils/Language";
+import { FileReader, FileWriter } from "./utils/FileWriter";
+import { Language } from "./utils/Language";
 
 export interface ResourceSchema {
   name: string;

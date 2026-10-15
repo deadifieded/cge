@@ -4,7 +4,7 @@ import {
   PrimitiveMemberValue,
   indent,
   CodeHolder,
-} from "@utils/codegen";
+} from "../../index";
 import { isStringObject } from "util/types";
 
 export function getTsCode(

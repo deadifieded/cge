@@ -1,0 +1,16 @@
+{
+  // The sandbox compiles the engine from `../src`, so edits there show up on
+  // the next `npm run example` without a build.
+  "extends": "../tsconfig.json",
+  "include": ["cge/src/**/*"],
+  "compilerOptions": {
+    "rootDir": "..",
+    "paths": {
+      "codegen-engine": ["../src/index.ts"],
+      "@modules": ["./cge/src/modules"],
+      "@resources/*": ["./cge/src/resources/*"],
+      "@schemas/*": ["./cge/src/schemas/*"],
+      "@config": ["./cge/src/config.ts"]
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { PrimitiveMemberValue } from "@utils/codegen";
+import { PrimitiveMemberValue } from "./index";
 
 export const pythonTypeMap: {
   [key in PrimitiveMemberValue]: string;

@@ -9,8 +9,8 @@ import {
   uniformCode,
   isUndefineable,
   pythonTypeMap,
-} from "@utils/codegen";
-import { Language, Languages } from "@utils/Language";
+} from "../index";
+import { Language, Languages } from "../../Language";
 
 export type Inputs = { [name: string]: Type };
 export type OptionalInputs = {

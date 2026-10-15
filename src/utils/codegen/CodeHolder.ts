@@ -1,4 +1,4 @@
-import { Language } from "@utils/Language";
+import { Language } from "../Language";
 import { indent } from "./index";
 
 export class CodeHolder {

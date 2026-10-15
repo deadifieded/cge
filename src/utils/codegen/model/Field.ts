@@ -1,5 +1,5 @@
-import { Type, Code } from "@utils/codegen";
-import { Language } from "@utils/Language";
+import { Type, Code } from "../index";
+import { Language } from "../../Language";
 
 export class Field {
   name: string;

@@ -1,5 +1,5 @@
 import type { EnvironmentConfig } from "../../types";
-import { CodeHolder } from "@utils/codegen";
+import { CodeHolder } from "../../utils/codegen";
 
 export default function render<Environment extends string>(environments: EnvironmentConfig<Environment>): string {
   const { names, variable } = environments;

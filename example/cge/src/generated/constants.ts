@@ -1,0 +1,14 @@
+export const ENVIRONMENTS = ["development", "staging", "production"] as const;
+export type Environment = (typeof ENVIRONMENTS)[number];
+
+function isEnvironment(value: string): value is Environment {
+  return (ENVIRONMENTS as readonly string[]).includes(value);
+}
+
+const environment = process.env.ENVIRONMENT || "production";
+if (!isEnvironment(environment)) {
+  throw new Error(
+    `ENVIRONMENT is "${environment}", expected one of: development, staging, production.`,
+  );
+}
+export const ENVIRONMENT: Environment = environment;

@@ -1,4 +1,4 @@
-import { Values } from "@utils/codegen";
+import { Values } from "./index";
 
 type ValuesMap = { [key: string]: Values };
 

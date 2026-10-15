@@ -1,5 +1,5 @@
 import type { EnvironmentConfig } from "../../types";
-import { CodeHolder } from "@utils/codegen";
+import { CodeHolder } from "../../utils/codegen";
 
 /**
  * `process.env.<variable>` is written out literally because Next.js only

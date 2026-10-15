@@ -43,13 +43,6 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "skipLibCheck": true,
-    "paths": {
-      "@utils/*": ["./src/utils/*"],
-      "@modules": ["./src/modules"],
-      "@resources/*": ["./src/resources/*"],
-      "@schemas/*": ["./src/schemas/*"],
-      "@config": ["./src/config.ts"]
-    }
+    "skipLibCheck": true
   }
 }
