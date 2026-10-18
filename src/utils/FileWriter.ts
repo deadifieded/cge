@@ -90,7 +90,7 @@ export class FileWriter extends FileReader {
 
     for (const [file, change] of Object.entries(this.changes)) {
       const fullPath = join(this.root, file);
-      nofLines += Array.from(change.content.matchAll(/\n/g)).length;
+      
       if (change === undefined) {
         throw `Change for file ${fullPath} is undefined. This should not happen.`;
       }
@@ -106,6 +106,7 @@ export class FileWriter extends FileReader {
           );
         }
       }
+      nofLines += Array.from(content.matchAll(/\n/g)).length;
       // Ensure directory exists and write
       mkdirSync(dirname(fullPath), { recursive: true });
 
