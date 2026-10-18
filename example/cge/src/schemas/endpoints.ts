@@ -19,6 +19,50 @@ export const endpoints: ProjectEndpoints = [
           status: "string",
         },
       },
+      {
+        name: "GetUsername",
+        method: "GET",
+        route: "/username",
+        users: ["frontend"],
+        params: {},
+        output: {
+          status: "string",
+        },
+      },
+      {
+        name: "ChangeUsername",
+        method: "POST",
+        route: "/username/change",
+        users: ["frontend"],
+        input: {
+          newUsername: "string",
+        },
+        output: {
+          status: "string",
+        },
+      },
+      {
+        name: "GetCalendarData",
+        method: "GET",
+        route: "/calendar/data",
+        users: ["frontend"],
+        params: {"month": "number", "year": "number"},
+        output: {
+          datesAway: [{ date: "number", away: "boolean"}],
+        },
+      },
+      {
+        name: "EditCalendarData",
+        method: "POST",
+        route: "/calendar/data",
+        users: ["frontend"],
+        input: {
+          dayEdits: [{ date: "number", away: "boolean"}],
+        },
+        output: {
+          totalDaysAway: "number"
+        }
+      }
     ],
   },
 ];

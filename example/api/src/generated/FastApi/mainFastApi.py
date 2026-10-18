@@ -1,9 +1,9 @@
-from .FastApiCommon import HealthCheck
+from .FastApiCommon import HealthCheck, GetUsername, ChangeUsername, GetCalendarData, EditCalendarData
 from .FastApiCommon.baseAppError import BaseAppError
 from config import config, add_middleware, error_handler
 from fastapi import Request, Response, Depends
 from fastapi.responses import JSONResponse
-from handlers import HealthCheck as handlers_HealthCheck
+from handlers import HealthCheck as handlers_HealthCheck, GetUsername as handlers_GetUsername, ChangeUsername as handlers_ChangeUsername, GetCalendarData as handlers_GetCalendarData, EditCalendarData as handlers_EditCalendarData
 from logging import error as log_error
 from starlette.middleware.base import RequestResponseEndpoint, BaseHTTPMiddleware
 from typing import Awaitable
@@ -41,4 +41,22 @@ add_middleware(app)
 async def wrapper_HealthCheck(context: handlers_HealthCheck.Context = Depends() ) -> HealthCheck.outputType:
   params: HealthCheck.paramsType = {  }
   return await handlers_HealthCheck.handle( params, context)
+
+@app.get("/username")
+async def wrapper_GetUsername(context: handlers_GetUsername.Context = Depends() ) -> GetUsername.outputType:
+  params: GetUsername.paramsType = {  }
+  return await handlers_GetUsername.handle( params, context)
+
+@app.post("/username/change")
+async def wrapper_ChangeUsername(input: ChangeUsername.inputType, context: handlers_ChangeUsername.Context = Depends() ) -> ChangeUsername.outputType:
+  return await handlers_ChangeUsername.handle(input, context)
+
+@app.get("/calendar/data")
+async def wrapper_GetCalendarData(month: GetCalendarData.monthType, year: GetCalendarData.yearType, context: handlers_GetCalendarData.Context = Depends() ) -> GetCalendarData.outputType:
+  params: GetCalendarData.paramsType = { "month":month, "year":year }
+  return await handlers_GetCalendarData.handle( params, context)
+
+@app.post("/calendar/data")
+async def wrapper_EditCalendarData(input: EditCalendarData.inputType, context: handlers_EditCalendarData.Context = Depends() ) -> EditCalendarData.outputType:
+  return await handlers_EditCalendarData.handle(input, context)
 

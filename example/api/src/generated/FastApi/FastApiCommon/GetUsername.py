@@ -1,0 +1,33 @@
+from __future__ import annotations
+from types import EllipsisType
+from typing import TypedDict, List, NotRequired, TypeAlias, Optional
+
+class paramsType(TypedDict):
+  """
+  ```ts:
+  {
+  }
+  ```
+  """
+class paramsType_:
+  type_: TypeAlias = paramsType
+class outputType(TypedDict):
+  """
+  ```ts:
+  {
+    status: string;
+  }
+  ```
+  """
+  status: str
+  """
+  ```ts:
+  string
+  ```
+  """
+class outputType_:
+  type_: TypeAlias = outputType
+
+
+class Errors:
+  pass

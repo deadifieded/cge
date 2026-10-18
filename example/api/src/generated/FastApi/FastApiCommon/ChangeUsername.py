@@ -1,0 +1,41 @@
+from __future__ import annotations
+from types import EllipsisType
+from typing import TypedDict, List, NotRequired, TypeAlias, Optional
+
+class inputType(TypedDict):
+  """
+  ```ts:
+  {
+    newUsername: string;
+  }
+  ```
+  """
+  newUsername: str
+  """
+  ```ts:
+  string
+  ```
+  """
+class inputType_:
+  type_: TypeAlias = inputType
+
+class outputType(TypedDict):
+  """
+  ```ts:
+  {
+    status: string;
+  }
+  ```
+  """
+  status: str
+  """
+  ```ts:
+  string
+  ```
+  """
+class outputType_:
+  type_: TypeAlias = outputType
+
+
+class Errors:
+  pass
