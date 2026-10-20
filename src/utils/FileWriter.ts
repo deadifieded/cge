@@ -69,11 +69,25 @@ export type PlannedChange = {
   /** Relative to the root `FileWriter`. */
   file: string;
   action: PlannedAction;
+  /** How the file was staged. Unset for `remove`. */
+  mode?: FileWriteMode;
   /** The final content, for `create` and `update`. */
   content?: string;
+  /** Lines in the final content, after formatting. 0 for `remove`. */
+  lines: number;
 };
 
+export type FileLineCount = { files: number; lines: number };
+
 export type WriteMetrics = {
+  /** Everything staged this run, whether or not it ended up being written. */
+  attempted: {
+    /** Every staged `initialise` file, including ones that already exist. */
+    initialise: FileLineCount;
+    /** Every staged `write` or `append` file. */
+    write: FileLineCount;
+    total: FileLineCount;
+  };
   created: number;
   updated: number;
   removed: number;
@@ -160,18 +174,15 @@ export class FileWriter extends FileReader {
 
     for (const [file, change] of Object.entries(this.changes)) {
       const fullPath = join(this.root, file);
+      const { mode } = change;
 
-      if (change.mode === FileWriteMode.initialise) {
-        // Also left alone when its extensionless sibling exists, so a handler
-        // `Foo.py` can be turned into a `Foo/` package.
-        const exists =
-          existsSync(fullPath) ||
-          existsSync(fullPath.split(".").slice(0, -1).join("."));
-        if (exists) {
-          planned.push({ file, action: "unchanged" });
-          continue;
-        }
-      }
+      // Also left alone when its extensionless sibling exists, so a handler
+      // `Foo.py` can be turned into a `Foo/` package. It's still formatted
+      // below so its line count matches every other file's.
+      const keepExisting =
+        mode === FileWriteMode.initialise &&
+        (existsSync(fullPath) ||
+          existsSync(fullPath.split(".").slice(0, -1).join(".")));
 
       let content = change.content || "";
       if (format) {
@@ -188,18 +199,21 @@ export class FileWriter extends FileReader {
       // Added after formatting so a formatter can't move it off the first
       // line, where stale-file removal looks for it.
       const header =
-        change.mode !== FileWriteMode.initialise &&
+        mode !== FileWriteMode.initialise &&
         ownedDirs.some((dir) => isWithin(file, dir))
           ? headerByExtension[extname(file).slice(1)]
           : undefined;
       if (header) content = header + content;
+      const lines = content.match(/\n/g)?.length ?? 0;
 
-      if (!existsSync(fullPath)) {
-        planned.push({ file, action: "create", content });
+      if (keepExisting) {
+        planned.push({ file, mode, action: "unchanged", lines });
+      } else if (!existsSync(fullPath)) {
+        planned.push({ file, mode, action: "create", content, lines });
       } else if (readFileSync(fullPath, "utf-8") !== content) {
-        planned.push({ file, action: "update", content });
+        planned.push({ file, mode, action: "update", content, lines });
       } else {
-        planned.push({ file, action: "unchanged" });
+        planned.push({ file, mode, action: "unchanged", lines });
       }
     }
 
@@ -214,7 +228,7 @@ export class FileWriter extends FileReader {
         const file = relative(this.root, join(entry.parentPath, entry.name));
         // Files other tools write here (no marker) are left alone.
         if (!this.changes[file] && hasGeneratedHeader(join(this.root, file))) {
-          planned.push({ file, action: "remove" });
+          planned.push({ file, action: "remove", lines: 0 });
         }
       }
     }
@@ -251,15 +265,29 @@ export class FileWriter extends FileReader {
       this.owned.clear();
     }
 
+    const tally = (changes: PlannedChange[]): FileLineCount => ({
+      files: changes.length,
+      lines: changes.reduce((lines, change) => lines + change.lines, 0),
+    });
+    const staged = planned.filter((change) => change.mode !== undefined);
+    const initialise = staged.filter(
+      (change) => change.mode === FileWriteMode.initialise,
+    );
+    const write = staged.filter(
+      (change) => change.mode !== FileWriteMode.initialise,
+    );
+
     return {
+      attempted: {
+        initialise: tally(initialise),
+        write: tally(write),
+        total: tally(staged),
+      },
       created: count("create"),
       updated: count("update"),
       removed: count("remove"),
       unchanged: count("unchanged"),
-      linesInChanges: changed.reduce(
-        (lines, { content }) => lines + (content?.match(/\n/g)?.length ?? 0),
-        0,
-      ),
+      linesInChanges: tally(changed).lines,
       changed,
     };
   }

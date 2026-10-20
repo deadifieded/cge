@@ -1,6 +1,12 @@
 import type { PartConfig } from "./Part";
 import { Part, PartMap } from "./Part";
-import { FileWriter, type Formatter, type WriteMetrics } from "./utils/FileWriter";
+import {
+  FileWriteMode,
+  FileWriter,
+  type FileLineCount,
+  type Formatter,
+  type WriteMetrics,
+} from "./utils/FileWriter";
 import type { Resource } from "./Resource";
 
 export type PartConfigInput<Environment extends string> = PartConfig<Environment> & {
@@ -34,6 +40,22 @@ export type GenerateOptions = {
    */
   check?: boolean;
 };
+
+/** What was staged per write mode, then what actually changed on disk. */
+function formatSummary(stats: WriteMetrics) {
+  const { initialise, write, total } = stats.attempted;
+  const initialised = stats.changed.filter(
+    ({ mode }) => mode === FileWriteMode.initialise,
+  ).length;
+  const count = ({ files, lines }: FileLineCount) =>
+    `${String(files).padStart(4)} files, ${lines} lines`;
+  return [
+    `  Initialise: ${count(initialise)} (${initialised} created, ${initialise.files - initialised} already exist)`,
+    `  Write:      ${count(write)}`,
+    `  Total:      ${count(total)}`,
+    `  Changes:    ${stats.created} created, ${stats.updated} updated, ${stats.removed} removed, ${stats.unchanged} unchanged (${stats.linesInChanges} lines in changes)`,
+  ].join("\n");
+}
 
 export class Config<Environment extends string> {
   configProps: ConfigProps<Environment>;
@@ -76,7 +98,7 @@ export class Config<Environment extends string> {
     }
 
     const stats = await fileWriter.applyChanges(this.configProps.format, { check });
-    const summary = `${stats.created} created, ${stats.updated} updated, ${stats.removed} removed, ${stats.unchanged} unchanged (${stats.linesInChanges} lines in changes)`;
+    const summary = formatSummary(stats);
 
     if (check) {
       if (stats.changed.length > 0) {
@@ -84,12 +106,12 @@ export class Config<Environment extends string> {
           .map(({ action, file }) => `  ${action} ${file}`)
           .join("\n");
         throw new Error(
-          `Generated code is out of date (${summary}):\n${files}\nRun generate to update it.`,
+          `Generated code is out of date:\n${summary}\n${files}\nRun generate to update it.`,
         );
       }
-      console.log(`Generated code is up to date (${summary}).`);
+      console.log(`Generated code is up to date.\n${summary}`);
     } else {
-      console.log(`Success! ${summary}`);
+      console.log(`Success!\n${summary}`);
     }
     return stats;
   }
