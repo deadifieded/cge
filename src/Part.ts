@@ -80,8 +80,9 @@ export class Part<Environment extends string> {
     }
   }
 
-  clearGenerated() {
-    this.srcFileWriter.clear("generated");
+  /** Marks `generated/` as fully generated, so files no module wrote are removed. */
+  ownGenerated() {
+    this.srcFileWriter.own("generated");
   }
 }
 
@@ -156,9 +157,13 @@ function stagePartResourceChanges<Schema, Shared, Environment extends string>(
         `Part ${part.config.name}'s ${resource.name} is used by part ${userName}, which isn't in the config.`,
       );
     }
-    return (userIngesters[userName] = userPart
-      .getEntry(resource)
-      .userFactories.map(({ module, factory }) =>
+    const { userFactories } = userPart.getEntry(resource);
+    if (userFactories.length === 0) {
+      console.warn(
+        `Part ${userName} uses ${part.config.name}'s ${resource.name} schemas but has no module that uses ${resource.name}, so nothing is generated for it.`,
+      );
+    }
+    return (userIngesters[userName] = userFactories.map(({ module, factory }) =>
         factory({
           srcFileWriter: userPart.srcFileWriter,
           generatedFileWriter: userPart.generatedFileWriter.getScope(

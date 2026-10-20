@@ -20,6 +20,7 @@
     "typecheck": "tsgo --noEmit && tsgo --noEmit -p example",
     "prepublishOnly": "npm run typecheck && npm run build",
     "example": "tsx --tsconfig example/tsconfig.json example/cge/src/generate.ts",
+    "example:check": "tsx --tsconfig example/tsconfig.json example/cge/src/generate.ts --check",
     "example:uml": "tsx --tsconfig example/tsconfig.json example/cge/src/uml/serve.ts"
   },
   "keywords": [],

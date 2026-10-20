@@ -1,15 +1,7 @@
 import type { PartConfig } from "./Part";
 import { Part, PartMap } from "./Part";
-import { FileWriter, type Formatter } from "./utils/FileWriter";
+import { FileWriter, type Formatter, type WriteMetrics } from "./utils/FileWriter";
 import type { Resource } from "./Resource";
-
-/**
- * Every environment generated code can run in. `shared` in `schemas/` is
- * keyed by these names, so adding one here makes typecheck point at every
- * schema that needs an entry for it.
- */
-export const environments = ["development", "staging", "production"] as const;
-export type Environment = (typeof environments)[number];
 
 export type PartConfigInput<Environment extends string> = PartConfig<Environment> & {
   /**
@@ -30,10 +22,17 @@ export type ConfigProps<Environment extends string> = {
   parts: PartConfigInput<Environment>[];
   /**
    * Formats every generated file before it is written, e.g.
-   * `prettierFormatter(await import("prettier"))`. Pass `(content) => content`
-   * to write files as generated.
+   * `prettierFormatter(prettier)`. Files are written as generated when omitted.
    */
   format?: Formatter;
+};
+
+export type GenerateOptions = {
+  /**
+   * Write nothing, and throw if any file would be created, updated or
+   * removed. Use it in CI to check generated code is up to date.
+   */
+  check?: boolean;
 };
 
 export class Config<Environment extends string> {
@@ -41,7 +40,7 @@ export class Config<Environment extends string> {
   constructor(configProps: ConfigProps<Environment>) {
     this.configProps = configProps;
   }
-  async generate() {
+  async generate({ check = false }: GenerateOptions = {}): Promise<WriteMetrics> {
     const fileWriter = new FileWriter(this.configProps.root);
 
     const resources = new Set<Resource<any, any, Environment>>(
@@ -73,16 +72,25 @@ export class Config<Environment extends string> {
 
     for (const part of Object.values(parts)) {
       part.stageChanges(parts);
-    }
-    for (const part of Object.values(parts)) {
-      part.clearGenerated();
+      part.ownGenerated();
     }
 
-    try {
-      const stats = await fileWriter.applyChanges(this.configProps.format);
-      console.log(`Success!\nFiles in changes: ${stats.filesInChanges}, Lines in changes: ${stats.linesInChanges}`);
-    } catch (error) {
-      throw error;
+    const stats = await fileWriter.applyChanges(this.configProps.format, { check });
+    const summary = `${stats.created} created, ${stats.updated} updated, ${stats.removed} removed, ${stats.unchanged} unchanged (${stats.linesInChanges} lines in changes)`;
+
+    if (check) {
+      if (stats.changed.length > 0) {
+        const files = stats.changed
+          .map(({ action, file }) => `  ${action} ${file}`)
+          .join("\n");
+        throw new Error(
+          `Generated code is out of date (${summary}):\n${files}\nRun generate to update it.`,
+        );
+      }
+      console.log(`Generated code is up to date (${summary}).`);
+    } else {
+      console.log(`Success! ${summary}`);
     }
+    return stats;
   }
 }

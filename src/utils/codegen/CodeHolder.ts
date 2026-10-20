@@ -28,7 +28,7 @@ export class CodeHolder {
       this.code += _indent ? indent(_indent, code) : code;
     } else if (code instanceof CodeHolder) {
       if (code.language !== this.language) {
-        throw `CodeHolder language mismatch: expected "${this.language}", got "${code.language}". Code may not be generated correctly:\n${code.code}\n`;
+        throw new Error(`CodeHolder language mismatch: expected "${this.language}", got "${code.language}". Code may not be generated correctly:\n${code.code}\n`);
       }
       this.code += _indent ? indent(_indent, code.code) : code.code;
     }
@@ -57,7 +57,7 @@ export class CodeHolder {
         break;
 
       default:
-        throw `Unsupported language for code block: ${this.language}. Code may not be generated correctly.\n`;
+        throw new Error(`Unsupported language for code block: ${this.language}. Code may not be generated correctly.\n`);
     }
     return this;
   }
@@ -100,7 +100,7 @@ export class CodeHolder {
         break;
 
       default:
-        throw `Unsupported language for switch statement: ${this.language}. Code may not be generated correctly.\n`;
+        throw new Error(`Unsupported language for switch statement: ${this.language}. Code may not be generated correctly.\n`);
     }
     return this;
   }
@@ -128,7 +128,7 @@ export class CodeHolder {
         break;
 
       default:
-        throw `Unsupported language for if statement: ${this.language}. Code may not be generated correctly.\n`;
+        throw new Error(`Unsupported language for if statement: ${this.language}. Code may not be generated correctly.\n`);
     }
     return this;
   }

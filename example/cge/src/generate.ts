@@ -39,4 +39,4 @@ const config = new Config({
   ],
 });
 
-config.generate();
+await config.generate({ check: process.argv.includes("--check") });

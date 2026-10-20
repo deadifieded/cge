@@ -103,10 +103,10 @@ function renderRoute(
 
   Object.entries(endpoint.params || {}).forEach(([name, schema]) => {
     if (name === "input") {
-      throw `Parameter name cannot be "input" as it conflicts with the reserved name for request body. Found in endpoint ${endpoint.name}`;
+      throw new Error(`Parameter name cannot be "input" as it conflicts with the reserved name for request body. Found in endpoint ${endpoint.name}`);
     }
     if (name === "context") {
-      throw `Parameter name cannot be "context" as it conflicts with the reserved name for the handler context. Found in endpoint ${endpoint.name}`;
+      throw new Error(`Parameter name cannot be "context" as it conflicts with the reserved name for the handler context. Found in endpoint ${endpoint.name}`);
     }
     if (primitiveIsNullable(schema)) {
       optionalParams[name] = {

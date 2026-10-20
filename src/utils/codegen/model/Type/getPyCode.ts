@@ -50,13 +50,13 @@ function appendTypePy(
   namespaceCodeHolder: CodeHolder,
 ): string {
   if (!definition) {
-    throw `External types cannot be emitted. Type definition is undefined.`;
+    throw new Error(`External types cannot be emitted. Type definition is undefined.`);
   }
   if (typeof definition === "string") {
     let pythonType = pythonTypeMap?.[definition];
     if (pythonType) return pythonType;
     else
-      throw `Unsupported type definition: ${definition} when emitting Python type. Only ${Object.keys(pythonTypeMap).join(", ")}, nested objects, and arrays are supported.`;
+      throw new Error(`Unsupported type definition: ${definition} when emitting Python type. Only ${Object.keys(pythonTypeMap).join(", ")}, nested objects, and arrays are supported.`);
   } else if (Array.isArray(definition)) {
     assertArrayIsValid(definition);
     return (
@@ -116,7 +116,7 @@ function appendTypePy(
 
     return baseName;
   }
-  throw `Unsupported type definition: ${definition} when emitting Python type. Only ${Object.keys(pythonTypeMap).join(", ")}, nested objects, and arrays are supported.`;
+  throw new Error(`Unsupported type definition: ${definition} when emitting Python type. Only ${Object.keys(pythonTypeMap).join(", ")}, nested objects, and arrays are supported.`);
 }
 
 function appendSubtypePy(
@@ -129,13 +129,13 @@ function appendSubtypePy(
   first_item: boolean = true,
 ): string {
   if (!definition) {
-    throw `External types cannot be emitted. Type definition is undefined.`;
+    throw new Error(`External types cannot be emitted. Type definition is undefined.`);
   }
   if (typeof definition === "string") {
     let pythonType = pythonMemberTypeMap?.[definition];
     if (pythonType) return pythonType;
     else
-      throw `Unsupported type definition: ${definition} when emitting Python type. Only ${Object.keys(pythonMemberTypeMap).join(", ")}, nested objects, and arrays are supported.`;
+      throw new Error(`Unsupported type definition: ${definition} when emitting Python type. Only ${Object.keys(pythonMemberTypeMap).join(", ")}, nested objects, and arrays are supported.`);
   } else if (Array.isArray(definition)) {
     assertArrayIsValid(definition);
     return (
@@ -194,5 +194,5 @@ function appendSubtypePy(
 
     return total;
   }
-  throw `Unsupported type definition: ${definition} when emitting Python type. Only ${Object.keys(pythonMemberTypeMap).join(", ")}, nested objects, and arrays are supported.`;
+  throw new Error(`Unsupported type definition: ${definition} when emitting Python type. Only ${Object.keys(pythonMemberTypeMap).join(", ")}, nested objects, and arrays are supported.`);
 }

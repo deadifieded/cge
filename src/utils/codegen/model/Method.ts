@@ -67,7 +67,7 @@ export class Method {
 
     const body = this.body[language];
     if (!body) {
-      throw `No body defined for method ${this.name} in language ${language}`;
+      throw new Error(`No body defined for method ${this.name} in language ${language}`);
     }
     requirements.mergeRequirements(
       this.bodyRequirements?.[language] || new Requirements(),
@@ -90,7 +90,7 @@ export class Method {
           body,
         ).code;
       default:
-        throw `Unsupported language for Method code generation: ${language}. Code may not be generated correctly.\n`;
+        throw new Error(`Unsupported language for Method code generation: ${language}. Code may not be generated correctly.\n`);
     }
   }
 

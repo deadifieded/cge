@@ -79,29 +79,29 @@ export function isUndefineable(value: MemberValue): boolean {
   } else if (typeof value === "object") {
     return objectIsUndefineable(value);
   } else
-    throw `Unsupported value type: ${value} when checking if value is undefineable. Only primitive member values, arrays, and objects are supported.`;
+    throw new Error(`Unsupported value type: ${value} when checking if value is undefineable. Only primitive member values, arrays, and objects are supported.`);
 }
 
 export function assertArrayIsValid(value: MemberValue): boolean {
   if (Array.isArray(value)) {
     if (value.length < 1)
-      throw `Array type definition cannot be empty. Received: ${JSON.stringify(value)}`;
+      throw new Error(`Array type definition cannot be empty. Received: ${JSON.stringify(value)}`);
     if (value.length > 2) {
-      throw `Array type definition cannot have more than 2 elements. Received: ${JSON.stringify(
+      throw new Error(`Array type definition cannot have more than 2 elements. Received: ${JSON.stringify(
         value,
-      )}`;
+      )}`);
     }
     if (!value[0])
-      throw `Array type definition cannot have undefined as the first element. Received: ${JSON.stringify(value)}`;
+      throw new Error(`Array type definition cannot have undefined as the first element. Received: ${JSON.stringify(value)}`);
     if (isUndefineable(value[0]))
-      throw `Array type definition cannot have undefineable elements. Received: ${JSON.stringify(value)}`;
+      throw new Error(`Array type definition cannot have undefineable elements. Received: ${JSON.stringify(value)}`);
     if (
       value.length === 2 &&
       value[1] !== "undefined" &&
       value[1] !== "null" &&
       value[1] !== "null | undefined"
     ) {
-      throw `If array type definition has a second element (which defines its optionality and nullability), it must be "undefined", "null", or "null | undefined". Received: ${JSON.stringify(value)}`;
+      throw new Error(`If array type definition has a second element (which defines its optionality and nullability), it must be "undefined", "null", or "null | undefined". Received: ${JSON.stringify(value)}`);
     }
   }
   return false;

@@ -27,7 +27,7 @@ export function getTsCode(
 
 export function emitTypeTs(definition?: MemberValue): string {
   if (!definition) {
-    throw `External types cannot be emitted. Type definition is undefined.`;
+    throw new Error(`External types cannot be emitted. Type definition is undefined.`);
   }
   if (typeof definition === "string") {
     return definition;
@@ -65,7 +65,7 @@ export function emitTypeTs(definition?: MemberValue): string {
     type_text += "\n}";
     return type_text;
   }
-  throw `Unsupported type definition: ${definition} when emitting TypeScript type. Only "string", nested objects, and arrays are supported.`;
+  throw new Error(`Unsupported type definition: ${definition} when emitting TypeScript type. Only "string", nested objects, and arrays are supported.`);
 }
 
 export function emitTypeCheckTs(
@@ -75,7 +75,7 @@ export function emitTypeCheckTs(
   arrayDepth: number = 0,
 ): string {
   if (!definition) {
-    throw `External types cannot be emitted. Type definition is undefined.`;
+    throw new Error(`External types cannot be emitted. Type definition is undefined.`);
   }
   if (typeof definition === "string") {
     switch (definition) {
@@ -171,5 +171,5 @@ export function emitTypeCheckTs(
     });
     return codeHolder.code;
   }
-  throw `Unsupported type definition: ${definition} when emitting TypeScript type. Only "string", nested objects, and arrays are supported.`;
+  throw new Error(`Unsupported type definition: ${definition} when emitting TypeScript type. Only "string", nested objects, and arrays are supported.`);
 }

@@ -25,7 +25,7 @@ export class Type {
 
   getCode(language: Language, requirements: Requirements): string {
     if (!this.definition) {
-      throw `External types cannot be emitted. Type ${this.name[language]} is marked as external because its definition is undefined.`;
+      throw new Error(`External types cannot be emitted. Type ${this.name[language]} is marked as external because its definition is undefined.`);
     }
     switch (language) {
       case "py":
@@ -37,7 +37,7 @@ export class Type {
           this.withRuntimeTypeCheckerTs,
         );
       default:
-        throw `Unsupported language for Type code generation: ${language}. Code may not be generated correctly.\n`;
+        throw new Error(`Unsupported language for Type code generation: ${language}. Code may not be generated correctly.\n`);
     }
   }
 } //{ [key: string]: stringMap } | string | stringMap[];

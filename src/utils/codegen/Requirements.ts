@@ -17,7 +17,7 @@ export class Requirements {
 
   addRequirement(name: string, from: string) {
     if (this.requirements.has(name) && this.requirements.get(name) !== from) {
-      throw `Requirement ${name} already exists from ${this.requirements.get(name)}, cannot add from ${from}`;
+      throw new Error(`Requirement ${name} already exists from ${this.requirements.get(name)}, cannot add from ${from}`);
     }
     this.requirements.set(name, from);
   }
@@ -46,7 +46,7 @@ export class Requirements {
       case "ts":
         return this.getTsImportStatements();
       default:
-        throw `Unsupported language for import statement generation: ${language}. Code may not be generated correctly.\n`;
+        throw new Error(`Unsupported language for import statement generation: ${language}. Code may not be generated correctly.\n`);
     }
   }
 

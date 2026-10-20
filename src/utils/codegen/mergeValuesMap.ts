@@ -13,7 +13,7 @@ export function mergeValueNames(valuesMap: ValuesMap): Values {
         mergedValues[key2] =
           valuesMap[key1][key2] ||
           (() => {
-            throw `Missing value for key: ${key1}[${key2}] when merging values`;
+            throw new Error(`Missing value for key: ${key1}[${key2}] when merging values`);
           })();
       }
       {
@@ -23,7 +23,7 @@ export function mergeValueNames(valuesMap: ValuesMap): Values {
       reversedKeys[key2][key1] =
         valuesMap[key1][key2] ||
         (() => {
-          throw `Missing value for key: ${key1}[${key2}] when merging values`;
+          throw new Error(`Missing value for key: ${key1}[${key2}] when merging values`);
         })();
     }
   }
@@ -32,7 +32,7 @@ export function mergeValueNames(valuesMap: ValuesMap): Values {
     for (const key2 of duplicateKeys) {
       if (valuesMap[key1]?.[key2]) {
         if (mergedValues[`${key1}_${key2}`])
-          throw `Duplicate value for key: ${key1}_${key2} when trying to merge valuesMap: ${JSON.stringify(valuesMap)}`;
+          throw new Error(`Duplicate value for key: ${key1}_${key2} when trying to merge valuesMap: ${JSON.stringify(valuesMap)}`);
         mergedValues[`${key1}_${key2}`] = valuesMap[key1][key2];
       }
     }
