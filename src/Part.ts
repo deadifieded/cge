@@ -87,7 +87,7 @@ export class Part<Environment extends string> {
 }
 
 /** Builds the part's entry for `resource`: what it provides, and which of its modules handle it. */
-function loadPartResource<Schema, Shared, Environment extends string>(
+function loadPartResource<Schema extends ResourceSchema, Shared, Environment extends string>(
   part: Part<Environment>,
   resource: Resource<Schema, Shared, Environment>,
   
@@ -123,7 +123,7 @@ function loadPartResource<Schema, Shared, Environment extends string>(
     );
   }
   entry.shared = partResourceConfig.shared;
-  entry.schemas = partResourceConfig.schemas as Array<Schema & ResourceSchema>;
+  entry.schemas = partResourceConfig.schemas.sort((a, b) => a.name.localeCompare(b.name));
   return entry;
 }
 
