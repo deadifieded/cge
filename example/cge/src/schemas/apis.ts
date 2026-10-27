@@ -1,6 +1,6 @@
-import { ProjectEndpoints } from "@resources/api/types";
+import { ProjectApis } from "@resources/api";
 
-export const endpoints: ProjectEndpoints = [
+export const apis: ProjectApis = [
   {
     provider: "api",
     shared: {

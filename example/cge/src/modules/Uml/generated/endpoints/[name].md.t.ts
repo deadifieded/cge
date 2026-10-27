@@ -12,6 +12,10 @@ export default function render(endpoint: EndpointSchema): string {
   ] as const;
   for (const [field, value] of parts) {
     if (value === undefined) continue;
+    if (value === "file") {
+      members.push(`+file ${field}`);
+      continue;
+    }
     const type = diagram.typeOf(value, `${endpoint.name}_${field}`, {
       name: endpoint.name,
       field,

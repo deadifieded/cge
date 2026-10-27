@@ -92,8 +92,10 @@ function renderRoute(
   endpoint: EndpointSchema,
   requirements: Requirements,
 ): CodeHolder {
+  // Only the name is used. A file input's `inputType` is `UploadFile`, so
+  // FastAPI reads `input` as the multipart field of that name.
   const inputType: Type | undefined = endpoint.input
-    ? new Type(endpoint.name + ".inputType", endpoint.input)
+    ? new Type(endpoint.name + ".inputType")
     : undefined;
 
   const outputType = new Type(endpoint.name + ".outputType", endpoint.output);
@@ -103,10 +105,10 @@ function renderRoute(
 
   Object.entries(endpoint.params || {}).forEach(([name, schema]) => {
     if (name === "input") {
-      throw new Error(`Parameter name cannot be "input" as it conflicts with the reserved name for request body. Found in endpoint ${endpoint.name}`);
+      throw `Parameter name cannot be "input" as it conflicts with the reserved name for request body. Found in endpoint ${endpoint.name}`;
     }
     if (name === "context") {
-      throw new Error(`Parameter name cannot be "context" as it conflicts with the reserved name for the handler context. Found in endpoint ${endpoint.name}`);
+      throw `Parameter name cannot be "context" as it conflicts with the reserved name for the handler context. Found in endpoint ${endpoint.name}`;
     }
     if (primitiveIsNullable(schema)) {
       optionalParams[name] = {

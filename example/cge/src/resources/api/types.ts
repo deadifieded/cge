@@ -13,24 +13,26 @@ export type Error = {
 export type Method =
   "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "OPTIONS" | "HEAD";
 
-export type EndpointSchema = RouteSchema & {
-  method: Method;
-  input?: Value;
-  output?: Value;
-  errors?: Error[];
-};
-
-export type EndpointShared = RouteShared;
+export type Input = Value | "file";
 
 export type RouteSchema = ResourceSchema & {
   route: string;
   params?: { [key: string]: PrimitiveValue };
 };
 
+export type EndpointSchema = RouteSchema & {
+  method: Method;
+  input?: Input;
+  output?: Value;
+  errors?: Error[];
+};
+
 export type RouteShared = {
   origin: string;
 };
 
-export type PartEndpointConfig = GlobalPartResourceConfig<EndpointSchema, EndpointShared, Environment>
+export type EndpointShared = RouteShared;
 
-export type ProjectEndpoints = GlobalPartResourceConfigs<EndpointSchema, EndpointShared, Environment>;
+export type PartEndpoints = GlobalPartResourceConfig<EndpointSchema, EndpointShared, Environment>
+
+export type ProjectApis = GlobalPartResourceConfigs<EndpointSchema, EndpointShared, Environment>;

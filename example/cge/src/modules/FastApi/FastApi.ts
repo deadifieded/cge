@@ -46,7 +46,7 @@ export class FastApiIngester implements SchemaIngester<EndpointSchema> {
     if (this.language !== "py") return;
     this.generatedFileWriter.stageFileChange(
       "__init__.py",
-      FileWriteMode.initialise,
+      FileWriteMode.write,
       generatedInit(),
     );
     this.generatedFileWriter.stageFileChange(

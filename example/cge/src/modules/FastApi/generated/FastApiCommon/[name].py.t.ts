@@ -16,9 +16,12 @@ function renderTypes(endpoint: EndpointSchema, requirements: Requirements) {
       return new Type(name + "Type", schema);
     },
   );
-  const inputType = endpoint.input
-    ? new Type("inputType", endpoint.input)
-    : undefined;
+  // A file input is FastAPI's `UploadFile`, which has no schema to emit.
+  const isFile = endpoint.input === "file";
+  const inputType =
+    endpoint.input && endpoint.input !== "file"
+      ? new Type("inputType", endpoint.input)
+      : undefined;
   const outputType = new Type("outputType", endpoint.output || "null");
 
   const codeHolder = new CodeHolder("py");
@@ -30,6 +33,11 @@ function renderTypes(endpoint: EndpointSchema, requirements: Requirements) {
     codeHolder.line(
       new Type("paramsType", endpoint.params).getCode("py", requirements),
     );
+  }
+  if (isFile) {
+    requirements.addRequirement("UploadFile", "fastapi");
+    requirements.addRequirement("TypeAlias", "typing");
+    codeHolder.line("inputType: TypeAlias = UploadFile").line();
   }
   if (inputType) {
     codeHolder.line(inputType.getCode("py", requirements)).line();

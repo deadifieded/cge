@@ -26,11 +26,18 @@ export function buildClientModel(endpoint: EndpointSchema): Model {
   const clientType = new Type({ ts: "AxiosInstance", py: "ClientSession" });
   model.addField(new Field("client", undefined, clientType));
 
-  const inputType = new Type("InputType", endpoint.input || "null");
+  // A file input has no schema to emit, so its `InputType` alias is written
+  // in the additional code instead of being added as a model type.
+  const input = endpoint.input || "null";
+  const isFile = input === "file";
+  const inputType = isFile
+    ? new Type("InputType")
+    : new Type("InputType", input);
+
   const outputType = new Type("OutputType", endpoint.output || "null", true);
   const paramType = new Type("ParamType", endpoint.params || "null");
   model.addType(outputType);
-  model.addType(inputType);
+  if (!isFile) model.addType(inputType);
   model.addType(paramType);
 
   const handleRawMethod = new Method(
@@ -61,8 +68,14 @@ export function buildClientModel(endpoint: EndpointSchema): Model {
   tsRequirements.mergeRequirements(new Requirements({ "{ ORIGIN }": "../origin" }));
   const pyRequirements = new Requirements();
   pyRequirements.mergeRequirements(new Requirements({ ORIGIN: "..origin" }));
+  if (isFile) pyRequirements.addRequirement("TypeAlias", "typing");
   model.setAdditionalCode(
-    { ts: getTsAdditionalCode(endpoint.name, errors), py: "" },
+    {
+      ts:
+        (isFile ? "export type InputType = Blob;\n" : "") +
+        getTsAdditionalCode(endpoint.name, errors),
+      py: isFile ? "InputType: TypeAlias = bytes\n" : "",
+    },
     { ts: tsRequirements, py: pyRequirements },
   );
 
@@ -89,25 +102,47 @@ export function buildClientModel(endpoint: EndpointSchema): Model {
       }),
     },
   );
+  // A file goes up as the multipart field `input`, the name of the FastAPI
+  // wrapper's parameter. The client sets the multipart content type itself.
+  const tsBody = new CodeHolder("ts");
+  const pyBody = new CodeHolder("py");
+  if (isFile) {
+    tsBody
+      .append("const data = new FormData();")
+      .line('data.append("input", input);')
+      .line();
+    pyBody
+      .append("data = aiohttp.FormData()")
+      .line('data.add_field("input", input)')
+      .line();
+  }
   handleRawMethod.setBody(
     {
-      ts: new CodeHolder("ts")
+      ts: tsBody
         .append("const response = await this.client({")
         .line("method: " + methodField.getReference("ts") + ",", 2)
         .line("url: " + routeField.getReference("ts") + ",", 2)
         .line("baseURL: " + originField.getReference("ts") + ",", 2)
-        .line("headers: { 'content-type': 'application/json' },", 2)
-        .line("data: input,", 2)
+        .line(
+          isFile
+            ? "data: data,"
+            : "headers: { 'content-type': 'application/json' },\ndata: input,",
+          2,
+        )
         .line("params: params,", 2)
         .line("});")
         .line("return response.data").code,
 
-      py: new CodeHolder("py")
+      py: pyBody
         .append("resp = await self.client.request (")
         .line("method=" + methodField.getReference("py") + ",", 2)
         .line("url=" + routeField.getReference("py") + ",", 2)
-        .line("headers={ 'content-type': 'application/json' },", 2)
-        .line("data=input,", 2)
+        .line(
+          isFile
+            ? "data=data,"
+            : "headers={ 'content-type': 'application/json' },\ndata=input,",
+          2,
+        )
         .line("params=params,", 2)
         .line(")")
         .line("return { 'status': resp.status, 'data': await resp.json() }")
