@@ -5,7 +5,6 @@ import {
   PrimitiveMemberValue,
   pythonTypeMap,
   pythonMemberTypeMap,
-  assertArrayIsValid,
   Value,
 } from "../../index";
 import { emitTypeTs } from "./getTsCode";
@@ -58,11 +57,10 @@ function appendTypePy(
     else
       throw new Error(`Unsupported type definition: ${definition} when emitting Python type. Only ${Object.keys(pythonTypeMap).join(", ")}, nested objects, and arrays are supported.`);
   } else if (Array.isArray(definition)) {
-    assertArrayIsValid(definition);
     return (
       "List[ " +
       appendSubtypePy(
-        definition[0] as Value,
+        definition[0],
         baseName + "_item",
         baseName + "_item",
         codeHolder,
@@ -72,7 +70,7 @@ function appendTypePy(
       ) +
       " ]" +
       (definition?.[1]
-        ? " | " + pythonTypeMap?.[definition[1] as PrimitiveMemberValue]
+        ? " | " + pythonTypeMap?.[definition[1]]
         : "")
     );
   } else if (!isStringObject(definition)) {
@@ -137,11 +135,10 @@ function appendSubtypePy(
     else
       throw new Error(`Unsupported type definition: ${definition} when emitting Python type. Only ${Object.keys(pythonMemberTypeMap).join(", ")}, nested objects, and arrays are supported.`);
   } else if (Array.isArray(definition)) {
-    assertArrayIsValid(definition);
     return (
       "List[ " +
       appendSubtypePy(
-        definition[0] as Value,
+        definition[0],
         additional + (first_item ? "item" : ""),
         total + (first_item ? "_item" : ""),
         codeHolder,
@@ -151,7 +148,7 @@ function appendSubtypePy(
       ) +
       " ]" +
       (definition?.[1]
-        ? " | " + pythonTypeMap?.[definition[1] as PrimitiveMemberValue]
+        ? " | " + pythonTypeMap?.[definition[1]]
         : "")
     );
   } else if (!isStringObject(definition)) {

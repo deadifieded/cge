@@ -1,5 +1,4 @@
 import {
-  assertArrayIsValid,
   MemberValue,
   PrimitiveMemberValue,
   indent,
@@ -32,11 +31,10 @@ export function emitTypeTs(definition?: MemberValue): string {
   if (typeof definition === "string") {
     return definition;
   } else if (Array.isArray(definition)) {
-    assertArrayIsValid(definition);
     return (
       emitTypeTs(definition[0]) +
       "[]" +
-      (definition?.[1] ? ((" | " + definition[1]) as PrimitiveMemberValue) : "")
+      (definition?.[1] ? ((" | " + definition[1])) : "")
     );
   } else if (!isStringObject(definition)) {
     let type_text = "";
@@ -107,7 +105,6 @@ export function emitTypeCheckTs(
         return `if (typeof ${variableName} !== "${definition}") throw new Error(\`${name} is not of type ${definition}\`);`;
     }
   } else if (Array.isArray(definition)) {
-    assertArrayIsValid(definition);
     const index_var = "item" + String(arrayDepth);
     if (definition.length > 1) {
       return new CodeHolder("ts").if([

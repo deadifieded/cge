@@ -27,14 +27,16 @@ export type MemberValue =
   | ({ [key: string]: MemberValue } & {
       __or__?: "null" | "undefined" | "null | undefined";
     })
-  | Value;
+  | Value
+  | [Value, "undefined" | "null | undefined"]
 
 export type Value =
   | PrimitiveValue
   | ({ [key: string]: MemberValue } & {
       __or__?: "null";
     })
-  | MemberValue[];
+  | [Value]
+  | [Value, "null"];
 
 export type Values = { [key: string]: Value };
 
@@ -80,31 +82,6 @@ export function isUndefineable(value: MemberValue): boolean {
     return objectIsUndefineable(value);
   } else
     throw new Error(`Unsupported value type: ${value} when checking if value is undefineable. Only primitive member values, arrays, and objects are supported.`);
-}
-
-export function assertArrayIsValid(value: MemberValue): boolean {
-  if (Array.isArray(value)) {
-    if (value.length < 1)
-      throw new Error(`Array type definition cannot be empty. Received: ${JSON.stringify(value)}`);
-    if (value.length > 2) {
-      throw new Error(`Array type definition cannot have more than 2 elements. Received: ${JSON.stringify(
-        value,
-      )}`);
-    }
-    if (!value[0])
-      throw new Error(`Array type definition cannot have undefined as the first element. Received: ${JSON.stringify(value)}`);
-    if (isUndefineable(value[0]))
-      throw new Error(`Array type definition cannot have undefineable elements. Received: ${JSON.stringify(value)}`);
-    if (
-      value.length === 2 &&
-      value[1] !== "undefined" &&
-      value[1] !== "null" &&
-      value[1] !== "null | undefined"
-    ) {
-      throw new Error(`If array type definition has a second element (which defines its optionality and nullability), it must be "undefined", "null", or "null | undefined". Received: ${JSON.stringify(value)}`);
-    }
-  }
-  return false;
 }
 
 export function primitiveIsNullable(value: PrimitiveMemberValue): boolean {
