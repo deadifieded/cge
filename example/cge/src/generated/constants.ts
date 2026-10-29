@@ -6,7 +6,7 @@ function isEnvironment(value: string): value is Environment {
   return (ENVIRONMENTS as readonly string[]).includes(value);
 }
 
-const environment = process.env.ENVIRONMENT || "production";
+const environment = process.env.ENVIRONMENT || "development";
 if (!isEnvironment(environment)) {
   throw new Error(
     `ENVIRONMENT is "${environment}", expected one of: development, staging, production.`,

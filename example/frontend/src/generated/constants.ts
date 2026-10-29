@@ -6,7 +6,7 @@ function isEnvironment(value: string): value is Environment {
   return (ENVIRONMENTS as readonly string[]).includes(value);
 }
 
-const environment = process.env.NEXT_PUBLIC_ENVIRONMENT || "production";
+const environment = process.env.NEXT_PUBLIC_ENVIRONMENT || "development";
 if (!isEnvironment(environment)) {
   throw new Error(
     `NEXT_PUBLIC_ENVIRONMENT is "${environment}", expected one of: development, staging, production.`,

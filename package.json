@@ -26,7 +26,7 @@
   "keywords": [],
   "author": "John Cruickshank",
   "license": "MIT",
-  "description": "",
+  "description": "Lightweight, abstract plumbing for schema driven code generation. See https://github.com/deadifieded/cge/blob/main/example/. Includes some hastily thrown together codegen utilities.",
   "devDependencies": {
     "@types/node": "^24.10.2",
     "@typescript/native-preview": "^7.0.0-dev.20260328.1",

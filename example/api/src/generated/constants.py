@@ -5,7 +5,7 @@ from typing import Literal
 Environment = Literal["development", "staging", "production"]
 ENVIRONMENTS: tuple[Environment, ...] = ("development", "staging", "production")
 
-_environment = os.environ.get("ENVIRONMENT") or "production"
+_environment = os.environ.get("ENVIRONMENT") or "development"
 if _environment not in ENVIRONMENTS:
   raise ValueError(f"ENVIRONMENT is '{_environment}', expected one of: development, staging, production.")
 ENVIRONMENT: Environment = _environment

@@ -8,7 +8,7 @@ const config = new Config({
   // `example/`, wherever this is run from.
   root: fileURLToPath(new URL("../..", import.meta.url)),
   environments,
-  defaultEnvironment: "production",
+  defaultEnvironment: "development",
   environmentVariable: "ENVIRONMENT",
   format: prettierFormatter(prettier),
   parts: [
